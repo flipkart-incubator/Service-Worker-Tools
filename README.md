@@ -1,2 +1,2 @@
 # fk-retail-service-worker
-Creating a common service worket utility which can be used across retail application.
+Creating a common service worker utility which can be used across retail application.
