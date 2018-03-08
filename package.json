@@ -1,0 +1,23 @@
+{
+    "name": "fk-retail-service-worker",
+    "version": "1.0.0",
+    "description": "Service Worker generator and utility function",
+    "main": "index.js",
+    "dependencies": {
+        "uglify-js": "3.3.13"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.fkinternal.com/Flipkart/fk-retail-service-worker"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.fkinternal.com/Flipkart/fk-retail-service-worker/issues"
+    },
+    "homepage": "https://github.fkinternal.com/Flipkart/fk-retail-service-worker"
+}
