@@ -1,27 +1,28 @@
+'use strict';
+
 function injectServiceWorker(updateNotificationElementID, offlineNotificationElementID) {
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("/service-worker.js")
-            .then(function (reg) {
-                reg.onupdatefound = function () {
-                    const newWorker = reg.installing;
-                    newWorker.addEventListener('statechange', function (e) {
-                        if (navigator.serviceWorker.controller && reg.waiting && newWorker.state === "installed") {
-                            var awaitingSW = reg.waiting;
-                            if (updateNotificationElementID) {
-                                document.getElementById(updateNotificationElementID).style.display = "block";
-                                document.getElementById(updateNotificationElementID).addEventListener("click", function (e) {
-                                    e.preventDefault();
-                                    awaitingSW.postMessage("SKIP-WAITING");
-                                })
-                            } else {
-                                location.reload();
-                            }
+        navigator.serviceWorker.register("/service-worker.js").then(function (reg) {
+            reg.onupdatefound = function () {
+                var newWorker = reg.installing;
+                newWorker.addEventListener('statechange', function (e) {
+                    if (navigator.serviceWorker.controller && reg.waiting && newWorker.state === "installed") {
+                        var awaitingSW = reg.waiting;
+                        if (updateNotificationElementID) {
+                            document.getElementById(updateNotificationElementID).style.display = "block";
+                            document.getElementById(updateNotificationElementID).addEventListener("click", function (e) {
+                                e.preventDefault();
+                                awaitingSW.postMessage("SKIP-WAITING");
+                            });
+                        } else {
+                            location.reload();
                         }
-                    });
-                };
-            }, function (err) {
-                console.error('Service worker registration failed: ', err);
-            });
+                    }
+                });
+            };
+        }, function (err) {
+            console.error('Service worker registration failed: ', err);
+        });
         navigator.serviceWorker.addEventListener('message', function (event) {
             if (event.data === "SERVING-OFFLINE") {
                 if (offlineNotificationElementID) {
@@ -45,15 +46,15 @@ function updateServiceWorker() {
 function unregisterServiceWorker() {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function (registrations) {
-            for (let registration of registrations) {
-                registration.unregister()
-            }
-        })
+            registrations.forEach(function (registration) {
+                registration.unregister();
+            });
+        });
     }
 }
 
 module.exports = {
-    injectServiceWorker,
-    updateServiceWorker,
-    unregisterServiceWorker
-}
+    injectServiceWorker: injectServiceWorker,
+    updateServiceWorker: updateServiceWorker,
+    unregisterServiceWorker: unregisterServiceWorker
+};
