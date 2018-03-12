@@ -25,8 +25,9 @@ var messageHandler = function (event) {
     if (event.data === "SKIP-WAITING") {
         self.skipWaiting();
         clients.matchAll().then(function (clientList) {
-            var client = clientList[0];
-            client.postMessage("RELOAD");
+            clientList.forEach(function(client) {
+                client.postMessage("RELOAD");            
+            });
         });
     }
 
@@ -129,7 +130,7 @@ function generateFileContent() {
     return fileContent;
 }
 
-function generateServiceWorkerFile(staticAssets, staticAssetsCachePrefix, staticAssetsCacheName, dynamicAssetsCacheName) {
+function generateServiceWorkerFile(staticAssets, staticAssetsCachePrefix, staticAssetsCacheName, dynamicAssetsCacheName, uglify) {
     var data = generateFileContent.bind(this)()
         .replace(/URLS_TO_CACHE/, staticAssets.map(function (asset) {
             if (asset !== "../../index.html") {
@@ -141,12 +142,15 @@ function generateServiceWorkerFile(staticAssets, staticAssetsCachePrefix, static
         .replace(/STATIC_ASSETS_CACHE_PREFIX/g, "\"" + staticAssetsCachePrefix + "\"")
         .replace(/STATIC_ASSETS_CACHE_NAME/g, "\"" + staticAssetsCacheName + "\"")
         .replace(/DYNAMIC_ASSETS_CACHE_NAME/g, "\"" + dynamicAssetsCacheName + "\"");
-
-    var result = UglifyJS.minify(data, {
-        mangle: {
-            toplevel: true
-        }
-    }).code;
+    
+    var result = "";
+    if(uglify) {
+        var uglifyOptions = typeof uglify === "object" ? uglify : {};
+        result = UglifyJS.minify(data, uglifyOptions).code;
+    } else {
+        result = data;
+    }
+    
     fs.writeFile("../service-worker.js", result, function (err) {
         if (err) {
             throw err;
@@ -158,14 +162,15 @@ function generateServiceWorkerFile(staticAssets, staticAssetsCachePrefix, static
 ServiceWorkerGenerator.prototype.apply = function (compiler) {
     var self = this,
         cacheFirstNamePrefix = (self.options && self.options.cacheFirst && self.options.cacheFirst.cacheNamePrefix) || 'static',
-        networkFirstNamePrefix = (self.options && self.options.networkFirst && self.options.networkFirst.cacheNamePrefix) || 'dynamic';
+        networkFirstNamePrefix = (self.options && self.options.networkFirst && self.options.networkFirst.cacheNamePrefix) || 'dynamic',
+        uglify = (self.options && self.options.uglify) || false;
 
     compiler.plugin("emit", function (compilation, callback) {
         var assets = [];
         for (var fileName in compilation.assets) {
             assets.push(fileName);
         }
-        generateServiceWorkerFile.bind(self)(assets, cacheFirstNamePrefix, cacheFirstNamePrefix + '-' + crypto.createHash("sha256").update(assets.toString()).digest("base64"), networkFirstNamePrefix);
+        generateServiceWorkerFile.bind(self)(assets, cacheFirstNamePrefix, cacheFirstNamePrefix + '-' + crypto.createHash("sha256").update(assets.toString()).digest("base64"), networkFirstNamePrefix, uglify);
         callback();
     })
 }
