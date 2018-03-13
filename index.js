@@ -1,5 +1,5 @@
 'use strict';
 module.exports = {
-    serviceWorkerGenerator: require('./serviceWorkerGenerator'),
-    serviceWorkerUtils: require('./serviceWorkerUtils')
+    generator: require('./webpack-sw-generator'),
+    utils: require('./sw-utils')
 };
