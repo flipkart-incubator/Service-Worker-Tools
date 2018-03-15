@@ -1,6 +1,6 @@
 'use strict';
 
-function injectServiceWorker(updateNotificationElementID, offlineNotificationElementID) {
+function injectServiceWorker(updateCallback) {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register("/service-worker.js").then(function (reg) {
             reg.onupdatefound = function () {
@@ -8,14 +8,10 @@ function injectServiceWorker(updateNotificationElementID, offlineNotificationEle
                 newWorker.addEventListener('statechange', function (e) {
                     if (navigator.serviceWorker.controller && reg.waiting && newWorker.state === "installed") {
                         var awaitingSW = reg.waiting;
-                        if (updateNotificationElementID) {
-                            document.getElementById(updateNotificationElementID).style.display = "block";
-                            document.getElementById(updateNotificationElementID).addEventListener("click", function (e) {
-                                e.preventDefault();
-                                awaitingSW.postMessage("SKIP-WAITING");
-                            });
+                        if (updateCallback && typeof updateCallback === 'function') {
+                            updateCallback(awaitingSW);
                         } else {
-                            location.reload();
+                            console.error("No updateCallback found.");
                         }
                     }
                 });
@@ -24,11 +20,7 @@ function injectServiceWorker(updateNotificationElementID, offlineNotificationEle
             console.error('Service worker registration failed: ', err);
         });
         navigator.serviceWorker.addEventListener('message', function (event) {
-            if (event.data === "SERVING-OFFLINE") {
-                if (offlineNotificationElementID) {
-                    document.getElementById(offlineNotificationElementID).style.display = "block";
-                }
-            } else if (event.data === "RELOAD") {
+            if (event.data === "RELOAD") {
                 location.reload();
             }
         });
