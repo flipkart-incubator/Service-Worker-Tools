@@ -86,10 +86,6 @@ var networkFirstHandler = function (event) {
                 return networkResponse;
             })
             .catch(function () {
-                clients.matchAll().then(function (clientList) {
-                    var client = clientList[0];
-                    client.postMessage("SERVING-OFFLINE");
-                });
                 return caches.match(event.request);
             })
         )
