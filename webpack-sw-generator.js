@@ -126,22 +126,22 @@ function generateFileContent() {
     return fileContent;
 }
 
-function generateServiceWorkerFile(staticAssets, staticAssetsCachePrefix, staticAssetsCacheName, dynamicAssetsCacheName, uglify) {
+function generateServiceWorkerFile(options) {
     var data = generateFileContent.bind(this)()
-        .replace(/URLS_TO_CACHE/, staticAssets.map(function (asset) {
+        .replace(/URLS_TO_CACHE/, options.staticAssets.map(function (asset) {
             if (asset !== "../../index.html") {
-                return "\"/minified/scripts/" + asset + "\"";
+                return "\"" + options.assetsPrefix + asset +  "\"";
             }
             return "\"/\"";
 
         }).join(','))
-        .replace(/STATIC_ASSETS_CACHE_PREFIX/g, "\"" + staticAssetsCachePrefix + "\"")
-        .replace(/STATIC_ASSETS_CACHE_NAME/g, "\"" + staticAssetsCacheName + "\"")
-        .replace(/DYNAMIC_ASSETS_CACHE_NAME/g, "\"" + dynamicAssetsCacheName + "\"");
+        .replace(/STATIC_ASSETS_CACHE_PREFIX/g, "\"" + options.staticAssetsCachePrefix + "\"")
+        .replace(/STATIC_ASSETS_CACHE_NAME/g, "\"" + options.staticAssetsCacheName + "\"")
+        .replace(/DYNAMIC_ASSETS_CACHE_NAME/g, "\"" + options.dynamicAssetsCacheName + "\"");
     
     var result = "";
-    if(uglify) {
-        var uglifyOptions = typeof uglify === "object" ? uglify : {};
+    if(options.uglify) {
+        var uglifyOptions = typeof options.uglify === "object" ? options.uglify : {};
         result = UglifyJS.minify(data, uglifyOptions).code;
     } else {
         result = data;
@@ -159,14 +159,22 @@ ServiceWorkerGenerator.prototype.apply = function (compiler) {
     var self = this,
         cacheFirstNamePrefix = (self.options && self.options.cacheFirst && self.options.cacheFirst.cacheNamePrefix) || 'static',
         networkFirstNamePrefix = (self.options && self.options.networkFirst && self.options.networkFirst.cacheNamePrefix) || 'dynamic',
-        uglify = (self.options && self.options.uglify) || false;
+        uglify = (self.options && self.options.uglify) || false,
+        assetsPrefix = self.options.assetsPrefix;
 
     compiler.plugin("emit", function (compilation, callback) {
         var assets = [];
         for (var fileName in compilation.assets) {
             assets.push(fileName);
         }
-        generateServiceWorkerFile.bind(self)(assets, cacheFirstNamePrefix, cacheFirstNamePrefix + '-' + crypto.createHash("sha256").update(assets.toString()).digest("base64"), networkFirstNamePrefix, uglify);
+        generateServiceWorkerFile.bind(self)({
+			staticAssets:assets,
+			cacheFirstNamePrefix:cacheFirstNamePrefix,
+			staticAssetsCacheName:cacheFirstNamePrefix + '-' + crypto.createHash("sha256").update(assets.toString()).digest("base64"),
+			networkFirstNamePrefix:networkFirstNamePrefix,
+			uglify:uglify,
+			assetsPrefix:assetsPrefix
+		});
         callback();
     })
 }
