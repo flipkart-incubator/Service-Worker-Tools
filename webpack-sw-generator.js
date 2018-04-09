@@ -135,9 +135,9 @@ function generateServiceWorkerFile(options) {
             return "\"/\"";
 
         }).join(','))
-        .replace(/STATIC_ASSETS_CACHE_PREFIX/g, "\"" + options.staticAssetsCachePrefix + "\"")
+        .replace(/STATIC_ASSETS_CACHE_PREFIX/g, "\"" + options.cacheFirstNamePrefix + "\"")
         .replace(/STATIC_ASSETS_CACHE_NAME/g, "\"" + options.staticAssetsCacheName + "\"")
-        .replace(/DYNAMIC_ASSETS_CACHE_NAME/g, "\"" + options.dynamicAssetsCacheName + "\"");
+        .replace(/DYNAMIC_ASSETS_CACHE_NAME/g, "\"" + options.networkFirstNamePrefix + "\"");
     
     var result = "";
     if(options.uglify) {
