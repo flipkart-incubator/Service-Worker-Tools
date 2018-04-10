@@ -121,7 +121,7 @@ function generateFileContent(options) {
 
          }).join(',')}];\n\n` +
         `self.addEventListener("message", ${messageHandler})\n\n` +
-        `self.addEventListener("install",${generateInstallHandler(options.cacheFirstNamePrefix, options.fetchOptions)})\n\n` +
+        `self.addEventListener("install",${generateInstallHandler(options.staticAssetsCacheName, options.fetchOptions)})\n\n` +
         `self.addEventListener("activate", ${generateActivationHandler(options.cacheFirstNamePrefix, options.staticAssetsCacheName)})\n\n`;
 
     /* add cacheFirstHandler if there are static assets to fetch */
