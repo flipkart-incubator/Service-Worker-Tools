@@ -4,35 +4,35 @@ Think in terms of strategies for routes in your application , and put them in a 
 
 ```
 new ServiceWorkerGeneratorPlugin({
-			cacheFirst: {
-				cacheNamePrefix: "ASSETS",
-				routes: [{
-					uri: "/www/fk-retail-vpp/",
-					match: "includes",
-					ignoreHashFragment: false
-				}]
-			},
-			networkFirst: {
-				cacheNamePrefix: "DATA",
-				routes: [{
-					uri: "/vendor/",
-					match: "includes",
-					ignoreHashFragment: false
-				}, {
-					uri: "https://vendorhub.flipkart.com/isAuthenticated",
-					match: "exact",
-					ignoreHashFragment: false
-				}]
-			},
-			uglify: {
-				mangle: {
-					toplevel: true
-				},
-				compress: {
-					warnings: false,
-					drop_console: true
-				}
-			},
-			assetsPrefix:"https://retail.flixcart.com/www/fk-retail-vpp/"
-		})
+    assetsPrefix: "https://retail.flixcart.com/www/fk-retail-vpp/",
+    cacheFirst: {
+        cacheNamePrefix: "ASSETS",
+        routes: [{
+            uri: "/www/fk-retail-vpp/",
+            match: "includes",
+            ignoreHashFragment: false
+        }]
+    },
+    networkFirst: {
+        cacheNamePrefix: "DATA",
+        routes: [{
+            uri: "/vendor/",
+            match: "includes",
+            ignoreHashFragment: false
+        }, {
+            uri: "https://vendorhub.flipkart.com/isAuthenticated",
+            match: "exact",
+            ignoreHashFragment: false
+        }]
+    },
+    uglify: {
+        mangle: {
+            toplevel: true
+        },
+        compress: {
+            warnings: false,
+            drop_console: true
+        }
+    }
+})
 ```
