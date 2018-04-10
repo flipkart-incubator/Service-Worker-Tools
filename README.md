@@ -36,3 +36,45 @@ new ServiceWorkerGeneratorPlugin({
     }
 })
 ```
+With 'fetchOptions'
+```
+new ServiceWorkerGeneratorPlugin({
+    assetsPrefix: "/minified/scripts/",
+    fetchOptions: {
+        credentials: "include"
+    },
+    cacheFirst: {
+        cacheNamePrefix: "RPM-STATIC",
+        routes: [{
+            uri: "/minified/scripts",
+            match: "includes",
+            ignoreHashFragment: false
+        }]
+    },
+    networkFirst: {
+        cacheNamePrefix: "RPM_DYNAMIC",
+        routes: [{
+            uri: "/rpm/",
+            match: "includes",
+            ignoreHashFragment: false
+        }, {
+            uri: "https://hermes-ui.nm.flipkart.com/isAuthenticated",
+            match: "exact",
+            ignoreHashFragment: false
+        }]
+    },
+
+    uglify: {
+        mangle: {
+            toplevel: true
+        },
+        compress: {
+            warnings: false,
+            drop_console: true
+        }
+    }
+})
+```
+
+
+
