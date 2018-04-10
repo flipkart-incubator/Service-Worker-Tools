@@ -6,19 +6,20 @@ var fs = require("fs"),
 
 function ServiceWorkerGenerator(options) {
     this.options = options;
+
 }
 
-var installHandler = function (event) {
-    event.waitUntil(caches.open(STATIC_ASSETS_CACHE_NAME).then(function (cache) {
-        console.log("Opened cache");
-        return cache.addAll(urlsToCache.map(function (urlToPrefetch) {
-            return new Request(urlToPrefetch, {
-                credentials: 'include'
+var generateInstallHandler = function(staticAssetsCacheName, fetchOptions) {
+    return `function (event) {
+        event.waitUntil(caches.open("${staticAssetsCacheName}").then(function (cache) {
+            console.log("Opened cache");
+            return cache.addAll(urlsToCache.map(function (urlToPrefetch) {
+                return new Request(urlToPrefetch,${JSON.stringify(fetchOptions)});
+            })).then(function () {
+                console.log('All resources have been fetched and cached.');
             });
-        })).then(function () {
-            console.log('All resources have been fetched and cached.');
-        });
-    }));
+        }));
+    }`;
 }
 
 var messageHandler = function (event) {
@@ -30,67 +31,71 @@ var messageHandler = function (event) {
             });
         });
     }
-
 }
 
-var activationHandler = function (event) {
-    // delete any caches that aren't in expectedCaches
-    event.waitUntil(
-        caches.keys()
-        .then(function (keys) {
-            Promise.all(
-                keys.map(function (key) {
-                    if (key.startsWith(STATIC_ASSETS_CACHE_PREFIX) && key !== STATIC_ASSETS_CACHE_NAME) {
-                        return caches.delete(key);
+var generateActivationHandler = function(staticAssetsPrefix, staticAssetsCacheName) {
+    return `function (event) {
+        event.waitUntil(
+            caches.keys()
+            .then(function (keys) {
+                Promise.all(
+                    keys.map(function (key) {
+                        if (key !== "${staticAssetsCacheName}") {
+                            return caches.delete(key);
+                        }
+                    })
+                )
+            })
+        );
+    }`;
+}
+
+var generateStaticAssetsFetchHandler = function(staticRouting) {
+    return `function (event) {
+        var request = event.request.url,
+        hashFragmentStart = request.indexOf('#');
+        if (hashFragmentStart > -1) {
+            request = request.substr(0, hashFragmentStart);
+        }
+        if (${staticRouting}) {
+            event.respondWith(caches.match(event.request).then(function (response) {
+                if (response) {
+                    console.log(event.request.url);
+                    return response;
+                }
+                return fetch(event.request);
+            }));
+        }
+    }`;
+}
+
+var generateDynamicRouting = function(dynamicCacheName, dynamicRouting) {
+    return `function (event) {
+        var request = event.request.url,
+        hashFragmentStart = request.indexOf('#');
+        if (hashFragmentStart > -1) {
+            request = request.substr(0, hashFragmentStart);
+        }
+        if (${dynamicRouting}) {
+            event.respondWith(
+                fetch(event.request)
+                .then(function (networkResponse) {
+                    if (event.request.method === "GET") {
+                        return caches.open("${dynamicCacheName}")
+                            .then(function (cache) {
+                                cache.add(event.request, networkResponse);
+                                return networkResponse;
+                            });
                     }
+                    return networkResponse;
+                })
+                .catch(function () {
+                    return caches.match(event.request);
                 })
             )
-        })
-    );
+        }
+    }`.toString();
 }
-
-var staticAssetsFetchHandler = function (event) {
-    var request = event.request.url;
-    hashFragmentStart = request.indexOf('#');
-    if (hashFragmentStart > -1) {
-        request = request.substr(0, hashFragmentStart);
-    }
-    if (STATIC_ROUTES_BUILD) {
-        event.respondWith(caches.match(event.request).then(function (response) {
-            if (response) {
-                console.log(event.request.url);
-                return response;
-            }
-            return fetch(event.request);
-        }));
-    }
-}
-
-var networkFirstHandler = function (event) {
-    var request = event.request.url;
-    hashFragmentStart = request.indexOf('#');
-    if (hashFragmentStart > -1) {
-        request = request.substr(0, hashFragmentStart);
-    }
-    if (DYNAMIC_ROUTES_BUILD) {
-        event.respondWith(
-            fetch(event.request)
-            .then(function (networkResponse) {
-                if (event.request.method === "GET") {
-                    return caches.open(DYNAMIC_ASSETS_CACHE_NAME)
-                        .then(function (cache) {
-                            cache.add(event.request, networkResponse);
-                            return networkResponse;
-                        });
-                }
-                return networkResponse;
-            })
-            .catch(function () {
-                return caches.match(event.request);
-            })
-        )
-    }
-};
 
 function generateRouting(type) {
     var parts = [],
@@ -105,40 +110,35 @@ function generateRouting(type) {
     return parts.join(" || ");
 }
 
-function generateFileContent() {
+function generateFileContent(options) {
     var networkFirstRoutes = generateRouting.bind(this)("networkFirst"),
         cacheFirstRoutes = generateRouting.bind(this)("cacheFirst"),
-        fileContent = `var urlsToCache = [URLS_TO_CACHE];\n\n` +
+        fileContent = `var urlsToCache = [${options.staticAssets.map(function (asset) {
+            if (asset !== "../../index.html") {
+                return "\"" + options.assetsPrefix + asset +  "\"";
+            }
+            return "\"/\"";
+
+         }).join(',')}];\n\n` +
         `self.addEventListener("message", ${messageHandler})\n\n` +
-        `self.addEventListener("install",${installHandler})\n\n` +
-        `self.addEventListener("activate", ${activationHandler})\n\n`;
+        `self.addEventListener("install",${generateInstallHandler(options.cacheFirstNamePrefix, options.fetchOptions)})\n\n` +
+        `self.addEventListener("activate", ${generateActivationHandler(options.cacheFirstNamePrefix, options.staticAssetsCacheName)})\n\n`;
 
     /* add cacheFirstHandler if there are static assets to fetch */
     if (cacheFirstRoutes !== "") {
-        fileContent = `${fileContent}\n\nself.addEventListener("fetch", ${staticAssetsFetchHandler.toString().replace(/STATIC_ROUTES_BUILD/, cacheFirstRoutes)})`
+        fileContent = `${fileContent}\n\nself.addEventListener("fetch", ${generateStaticAssetsFetchHandler(cacheFirstRoutes)})`
     }
 
     /* add networkFirstHandler if there are dynamic routes to fetch */
     if (networkFirstRoutes !== "") {
-        fileContent = `${fileContent}\n\nself.addEventListener("fetch", ${networkFirstHandler.toString().replace(/DYNAMIC_ROUTES_BUILD/, networkFirstRoutes)})`
+        fileContent = `${fileContent}\n\nself.addEventListener("fetch", ${generateDynamicRouting(options.networkFirstNamePrefix,networkFirstRoutes)})`
     }
 
     return fileContent;
 }
 
 function generateServiceWorkerFile(options) {
-    var data = generateFileContent.bind(this)()
-        .replace(/URLS_TO_CACHE/, options.staticAssets.map(function (asset) {
-            if (asset !== "../../index.html") {
-                return "\"" + options.assetsPrefix + asset +  "\"";
-            }
-            return "\"/\"";
-
-        }).join(','))
-        .replace(/STATIC_ASSETS_CACHE_PREFIX/g, "\"" + options.cacheFirstNamePrefix + "\"")
-        .replace(/STATIC_ASSETS_CACHE_NAME/g, "\"" + options.staticAssetsCacheName + "\"")
-        .replace(/DYNAMIC_ASSETS_CACHE_NAME/g, "\"" + options.networkFirstNamePrefix + "\"");
-    
+    var data = generateFileContent.bind(this)(options);
     var result = "";
     if(options.uglify) {
         var uglifyOptions = typeof options.uglify === "object" ? options.uglify : {};
@@ -160,7 +160,8 @@ ServiceWorkerGenerator.prototype.apply = function (compiler) {
         cacheFirstNamePrefix = (self.options && self.options.cacheFirst && self.options.cacheFirst.cacheNamePrefix) || 'static',
         networkFirstNamePrefix = (self.options && self.options.networkFirst && self.options.networkFirst.cacheNamePrefix) || 'dynamic',
         uglify = (self.options && self.options.uglify) || false,
-        assetsPrefix = self.options.assetsPrefix;
+        assetsPrefix = self.options.assetsPrefix,
+        fetchOptions = self.options.fetchOptions || {};
 
     compiler.plugin("emit", function (compilation, callback) {
         var assets = [];
@@ -173,7 +174,8 @@ ServiceWorkerGenerator.prototype.apply = function (compiler) {
 			staticAssetsCacheName:cacheFirstNamePrefix + '-' + crypto.createHash("sha256").update(assets.toString()).digest("base64"),
 			networkFirstNamePrefix:networkFirstNamePrefix,
 			uglify:uglify,
-			assetsPrefix:assetsPrefix
+            assetsPrefix:assetsPrefix,
+            fetchOptions:fetchOptions
 		});
         callback();
     })
