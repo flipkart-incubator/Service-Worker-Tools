@@ -24,16 +24,18 @@ var generateInstallHandler = function(staticAssetsCacheName, fetchOptions) {
 
 var generateMessageHandler = function(networkFirstCacheName) {
     return `function (event) {
-        if (event.data === "SKIP-WAITING") {
-            self.skipWaiting();
-            clients.matchAll().then(function (clientList) {
-                clientList.forEach(function(client) {
-                    client.postMessage("RELOAD");            
+        if(event.data) {
+            if (event.data.type === "SKIP-WAITING") {
+                self.skipWaiting();
+                clients.matchAll().then(function (clientList) {
+                    clientList.forEach(function(client) {
+                        client.postMessage("RELOAD");            
+                    });
                 });
-            });
-        }
-        if(event.data === "CLEAR-DATA") {
-            caches.delete("${networkFirstCacheName}")
+            }
+            else if(event.data.type === "CLEAR-DATA") {
+                caches.delete("${networkFirstCacheName}")
+            }
         }
     }`;
 }  
