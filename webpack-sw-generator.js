@@ -22,25 +22,32 @@ var generateInstallHandler = function(staticAssetsCacheName, fetchOptions) {
     }`;
 }
 
-var messageHandler = function (event) {
-    if (event.data === "SKIP-WAITING") {
-        self.skipWaiting();
-        clients.matchAll().then(function (clientList) {
-            clientList.forEach(function(client) {
-                client.postMessage("RELOAD");            
-            });
-        });
-    }
-}
+var generateMessageHandler = function(networkFirstCacheName) {
+    return `function (event) {
+        if(event.data) {
+            if (event.data.type === "SKIP-WAITING") {
+                self.skipWaiting();
+                clients.matchAll().then(function (clientList) {
+                    clientList.forEach(function(client) {
+                        client.postMessage("RELOAD");            
+                    });
+                });
+            }
+            else if(event.data.type === "CLEAR-DATA") {
+                caches.delete("${networkFirstCacheName}")
+            }
+        }
+    }`;
+}  
 
-var generateActivationHandler = function(staticAssetsPrefix, staticAssetsCacheName) {
+var generateActivationHandler = function(cacheFirstCacheName) {
     return `function (event) {
         event.waitUntil(
             caches.keys()
             .then(function (keys) {
                 Promise.all(
                     keys.map(function (key) {
-                        if (key !== "${staticAssetsCacheName}") {
+                        if (key !== "${cacheFirstCacheName}") {
                             return caches.delete(key);
                         }
                     })
@@ -120,9 +127,9 @@ function generateFileContent(options) {
             return "\"/\"";
 
          }).join(',')}];\n\n` +
-        `self.addEventListener("message", ${messageHandler})\n\n` +
+        `self.addEventListener("message", ${generateMessageHandler(options.networkFirstCacheName)})\n\n` +
         `self.addEventListener("install",${generateInstallHandler(options.staticAssetsCacheName, options.fetchOptions)})\n\n` +
-        `self.addEventListener("activate", ${generateActivationHandler(options.cacheFirstNamePrefix, options.staticAssetsCacheName)})\n\n`;
+        `self.addEventListener("activate", ${generateActivationHandler(options.cacheFirstCacheName)})\n\n`;
 
     /* add cacheFirstHandler if there are static assets to fetch */
     if (cacheFirstRoutes !== "") {
@@ -157,8 +164,8 @@ function generateServiceWorkerFile(options) {
 
 ServiceWorkerGenerator.prototype.apply = function (compiler) {
     var self = this,
-        cacheFirstNamePrefix = (self.options && self.options.cacheFirst && self.options.cacheFirst.cacheNamePrefix) || 'static',
-        networkFirstNamePrefix = (self.options && self.options.networkFirst && self.options.networkFirst.cacheNamePrefix) || 'dynamic',
+        cacheFirstCacheName = (self.options && self.options.cacheFirst && self.options.cacheFirst.cacheName) || 'static',
+        networkFirstCacheName = (self.options && self.options.networkFirst && self.options.networkFirst.cacheName) || 'dynamic',
         uglify = (self.options && self.options.uglify) || false,
         assetsPrefix = self.options.assetsPrefix,
         fetchOptions = self.options.fetchOptions || {};
@@ -170,12 +177,11 @@ ServiceWorkerGenerator.prototype.apply = function (compiler) {
         }
         generateServiceWorkerFile.bind(self)({
 			staticAssets:assets,
-			cacheFirstNamePrefix:cacheFirstNamePrefix,
-			staticAssetsCacheName:cacheFirstNamePrefix + '-' + crypto.createHash("sha256").update(assets.toString()).digest("base64"),
-			networkFirstNamePrefix:networkFirstNamePrefix,
-			uglify:uglify,
-            assetsPrefix:assetsPrefix,
-            fetchOptions:fetchOptions
+			cacheFirstCacheName:cacheFirstCacheName + '-' + crypto.createHash("sha256").update(assets.toString()).digest("base64"),
+			networkFirstCacheName,
+			uglify,
+            assetsPrefix,
+            fetchOptions
 		});
         callback();
     })
