@@ -45,8 +45,17 @@ function unregisterServiceWorker() {
     }
 }
 
+function clearData() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.controller.postMessage({
+            type:"CLEAR-DATA"
+        })
+    }
+}
+
 module.exports = {
     injectServiceWorker: injectServiceWorker,
     updateServiceWorker: updateServiceWorker,
-    unregisterServiceWorker: unregisterServiceWorker
+    unregisterServiceWorker: unregisterServiceWorker,
+    clearData:clearData,
 };
