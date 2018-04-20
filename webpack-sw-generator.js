@@ -138,7 +138,7 @@ function generateFileContent(options) {
 
     /* add networkFirstHandler if there are dynamic routes to fetch */
     if (networkFirstRoutes !== "") {
-        fileContent = `${fileContent}\n\nself.addEventListener("fetch", ${generateDynamicRouting(options.networkFirstNamePrefix,networkFirstRoutes)})`
+        fileContent = `${fileContent}\n\nself.addEventListener("fetch", ${generateDynamicRouting(options.networkFirstCacheName,networkFirstRoutes)})`
     }
 
     return fileContent;
