@@ -9,9 +9,9 @@ function ServiceWorkerGenerator(options) {
 
 }
 
-var generateInstallHandler = function(staticAssetsCacheName, fetchOptions) {
+var generateInstallHandler = function(cacheFirstCacheName, fetchOptions) {
     return `function (event) {
-        event.waitUntil(caches.open("${staticAssetsCacheName}").then(function (cache) {
+        event.waitUntil(caches.open("${cacheFirstCacheName}").then(function (cache) {
             console.log("Opened cache");
             return cache.addAll(urlsToCache.map(function (urlToPrefetch) {
                 return new Request(urlToPrefetch,${JSON.stringify(fetchOptions)});
@@ -128,7 +128,7 @@ function generateFileContent(options) {
 
          }).join(',')}];\n\n` +
         `self.addEventListener("message", ${generateMessageHandler(options.networkFirstCacheName)})\n\n` +
-        `self.addEventListener("install",${generateInstallHandler(options.staticAssetsCacheName, options.fetchOptions)})\n\n` +
+        `self.addEventListener("install",${generateInstallHandler(options.cacheFirstCacheName, options.fetchOptions)})\n\n` +
         `self.addEventListener("activate", ${generateActivationHandler(options.cacheFirstCacheName)})\n\n`;
 
     /* add cacheFirstHandler if there are static assets to fetch */
