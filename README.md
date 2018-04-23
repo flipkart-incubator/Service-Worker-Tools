@@ -44,7 +44,7 @@ Think of caching strategies you would like to apply and configure the plugin acc
     * mandatory
 * fetchOptions
     * options to be passed for the fetch calls for assets.
-    If ‘cookie’ needs to be passed with every fetch call, you’ll      need to set ‘credentials’ to true
+    If cookies needs to be passed with every fetch call, you’ll need to set ‘credentials’ to true
 
 ## Utility Methods ##
 * ‘injectServiceWorker’ 
