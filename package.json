@@ -6,7 +6,11 @@
     "dependencies": {
         "uglify-js": "3.3.13"
     },
-    "devDependencies": {},
+    "devDependencies": {
+        "eslint": "^4.19.1",
+        "eslint-config-airbnb-base": "^12.1.0",
+        "eslint-plugin-import": "^2.11.0"
+    },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },

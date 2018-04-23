@@ -1,61 +1,60 @@
-'use strict';
+
 
 function injectServiceWorker(updateCallback) {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("/service-worker.js").then(function (reg) {
-            reg.onupdatefound = function () {
-                var newWorker = reg.installing;
-                newWorker.addEventListener('statechange', function (e) {
-                    if (navigator.serviceWorker.controller && reg.waiting && newWorker.state === "installed") {
-                        var awaitingSW = reg.waiting;
-                        if (updateCallback && typeof updateCallback === 'function') {
-                            updateCallback(awaitingSW);
-                        } else {
-                            console.error("No updateCallback found.");
-                        }
-                    }
-                });
-            };
-        }, function (err) {
-            console.error('Service worker registration failed: ', err);
-        });
-        navigator.serviceWorker.addEventListener('message', function (event) {
-            if (event.data === "RELOAD") {
-                location.reload();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((reg) => {
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (navigator.serviceWorker.controller && reg.waiting && newWorker.state === 'installed') {
+              const awaitingSW = reg.waiting;
+              if (updateCallback && typeof updateCallback === 'function') {
+                updateCallback(awaitingSW);
+              }
             }
+          });
         });
-    }
+      }, (err) => {
+        throw new Error('Service worker registration failed: ', err);
+      });
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data === 'RELOAD') {
+        window.location.reload();
+      }
+    });
+  }
 }
 
 function updateServiceWorker() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(function (registration) {
-            registration.update();
-        });
-    }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then((registration) => {
+      registration.update();
+    });
+  }
 }
 
 function unregisterServiceWorker() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function (registrations) {
-            registrations.forEach(function (registration) {
-                registration.unregister();
-            });
-        });
-    }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      registrations.forEach((registration) => {
+        registration.unregister();
+      });
+    });
+  }
 }
 
 function clearData() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.controller.postMessage({
-            type:"CLEAR-DATA"
-        })
-    }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'CLEAR-DATA',
+    });
+  }
 }
 
 module.exports = {
-    injectServiceWorker: injectServiceWorker,
-    updateServiceWorker: updateServiceWorker,
-    unregisterServiceWorker: unregisterServiceWorker,
-    clearData:clearData,
+  injectServiceWorker,
+  updateServiceWorker,
+  unregisterServiceWorker,
+  clearData,
 };
