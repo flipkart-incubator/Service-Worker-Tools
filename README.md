@@ -55,5 +55,10 @@ new ServiceWorkerGeneratorPlugin({
    We recommend clearing data cache with  every successful login.
 
 
-
-
+## Contributing ##
+* sourceCode for library is present in src/
+            * Any changes should be made to this folder only
+            * If there are any changes done within src/, run following command
+                        npm run build
+            * Above command generates lib/ folder which should be pushed along with your changes.
+* We use babel to transpile es6 code to es5 code. (Presets used "babel-preset-es2015" with support for last two browsers.)
