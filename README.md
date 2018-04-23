@@ -35,11 +35,8 @@ new ServiceWorkerGeneratorPlugin({
 ## Options ##
 Think of caching strategies you would like to apply and configure the plugin accordingly. Bifurcate your application routes into ‘cache first’ ,  ‘network first’ and configure accordingly. 
 
-Both ‘cacheFirst’ and ‘networkFirst’ objects take the following options:
-* cacheName 
-    * the name you would want to give to the cache
-    * ‘String’
-    * defaults to ‘ASSETS’ for ‘cacheFirst’ and ‘DATA’ for ‘networkFirst’
+* cacheFirst / networkFirst
+    * cacheName ( String ) - defaults to 'ASSETS' for 'cacheFirst' and 'DATA' for 'networkFirst'         
 * uglify
     * https://github.com/webpack-contrib/uglifyjs-webpack-plugin
 * assetsPrefix
