@@ -164,9 +164,9 @@ function generateServiceWorkerFile(options) {
 
 ServiceWorkerGenerator.prototype.apply = function (compiler) {
     var self = this,
-        cacheFirstCacheName = (self.options && self.options.cacheFirst && self.options.cacheFirst.cacheName) ? self.options.cacheFirst.cacheName : 'static',
-        networkFirstCacheName = (self.options && self.options.networkFirst && self.options.networkFirst.cacheName) ? self.options.networkFirst.cacheName : 'dynamic',
-        uglify = (self.options && self.options.uglify) || false,
+        cacheFirstCacheName = (self.options.cacheFirst && self.options.cacheFirst.cacheName) ? self.options.cacheFirst.cacheName : 'static',
+        networkFirstCacheName = (self.options.networkFirst && self.options.networkFirst.cacheName) ? self.options.networkFirst.cacheName : 'dynamic',
+        uglify = self.options.uglify || {},
         assetsPrefix = self.options.assetsPrefix,
         fetchOptions = self.options.fetchOptions || {};
 
