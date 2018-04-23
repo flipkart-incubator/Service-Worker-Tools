@@ -101,7 +101,7 @@ var generateDynamicRouting = function(dynamicCacheName, dynamicRouting) {
                 })
             )
         }
-    }`.toString();
+    }`;
 }
 
 function generateRouting(type) {
