@@ -33,7 +33,7 @@ new ServiceWorkerGeneratorPlugin({
 ```
 
 ## Options ##
-Think of caching strategies you would like to apply and configure the plugin accordingly. Bifurcate your application routes into ‘cache first’ ,  ‘network first’ and configure accordingly. 
+Think of the caching strategies you would like to apply ('cache first' or 'network first') and configure the plugin accordingly. 
 
 * cacheFirst / networkFirst
     * cacheName ( String ) - defaults to 'ASSETS' for 'cacheFirst' and 'DATA' for 'networkFirst'         
