@@ -90,7 +90,8 @@ const generateDynamicRouting = (dynamicCacheName, dynamicRouting) => `function (
                 })
             )
         }
-    }`.toString();
+    }`;
+
 
 function generateRouting(type) {
   const parts = [];
