@@ -1,5 +1,5 @@
 # fk-retail-service-worker
-A webpack plugin that generates a service worker, and provides a set of utility methods to work with it. 
+A webpack plugin that generates a service worker, and provides a set of utility methods to work with it. Think of the caching strategies you would like to apply ('cache first' or 'network first') and configure the plugin accordingly.
 
 ## Usage Examples ##
 ```
@@ -33,8 +33,7 @@ new ServiceWorkerGeneratorPlugin({
 ```
 
 ## Options ##
-Think of the caching strategies you would like to apply ('cache first' or 'network first') and configure the plugin accordingly. 
-
+ 
 * cacheFirst / networkFirst
     * cacheName ( String ) - defaults to 'ASSETS' for 'cacheFirst' and 'DATA' for 'networkFirst'         
 * uglify
