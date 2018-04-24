@@ -2,52 +2,11 @@
 const fs = require('fs');
 const crypto = require('crypto');
 const UglifyJS = require('uglify-js');
+const eventHelpers = require('./helpers/eventHandlers');
 
 function ServiceWorkerGenerator(options) {
   this.options = options;
 }
-
-const generateInstallHandler = (cacheFirstCacheName, fetchOptions) => `function (event) {
-        event.waitUntil(caches.open("${cacheFirstCacheName}").then(function (cache) {
-            console.log("Opened cache");
-            return cache.addAll(urlsToCache.map(function (urlToPrefetch) {
-                return new Request(urlToPrefetch,${JSON.stringify(fetchOptions)});
-            })).then(function () {
-                console.log('All resources have been fetched and cached.');
-            });
-        }));
-    }`;
-
-const generateMessageHandler = networkFirstCacheName => `function (event) {
-        if(event.data) {
-            if (event.data.type === "SKIP-WAITING") {
-                self.skipWaiting();
-                clients.matchAll().then(function (clientList) {
-                    clientList.forEach(function(client) {
-                        client.postMessage("RELOAD");            
-                    });
-                });
-            }
-            else if(event.data.type === "CLEAR-DATA") {
-                caches.delete("${networkFirstCacheName}")
-            }
-        }
-    }`;
-
-const generateActivationHandler = cacheFirstCacheName => `function (event) {
-        event.waitUntil(
-            caches.keys()
-            .then(function (keys) {
-                Promise.all(
-                    keys.map(function (key) {
-                        if (key !== "${cacheFirstCacheName}") {
-                            return caches.delete(key);
-                        }
-                    })
-                )
-            })
-        );
-    }`;
 
 const generateStaticAssetsFetchHandler = staticRouting => `function (event) {
         var request = event.request.url,
@@ -115,9 +74,9 @@ function generateFileContent(options) {
     }
     return '"/"';
   }).join(',')}];\n\n` +
-        `self.addEventListener("message", ${generateMessageHandler(options.networkFirstCacheName)})\n\n` +
-        `self.addEventListener("install",${generateInstallHandler(options.cacheFirstCacheName, options.fetchOptions)})\n\n` +
-        `self.addEventListener("activate", ${generateActivationHandler(options.cacheFirstCacheName)})\n\n`;
+        `self.addEventListener("message", ${eventHelpers.generateMessageHandler(options.networkFirstCacheName)})\n\n` +
+        `self.addEventListener("install",${eventHelpers.generateInstallHandler(options.cacheFirstCacheName, options.fetchOptions)})\n\n` +
+        `self.addEventListener("activate", ${eventHelpers.generateActivationHandler(options.cacheFirstCacheName)})\n\n`;
 
     /* add cacheFirstHandler if there are static assets to fetch */
   if (cacheFirstRoutes !== '') {
