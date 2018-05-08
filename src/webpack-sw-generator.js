@@ -161,7 +161,7 @@ ServiceWorkerGenerator.prototype.apply = function apply(compiler) {
   const { options } = self;
   const cacheFirstCacheName = options.cacheFirst.cacheName;
   const networkFirstCacheName = options.networkFirst.cacheName;
-  const { uglify, assetsPrefix, fetchOptions } = options;
+  const { uglify, assetsPrefix, fetchOptions = {} } = options;
   compiler.plugin('emit', (compilation, callback) => {
     const assets = Object.keys(compilation.assets);
     generateServiceWorkerFile.bind(self)({
