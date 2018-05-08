@@ -1,6 +1,5 @@
 
 const fs = require('fs');
-const crypto = require('crypto');
 const UglifyJS = require('uglify-js');
 
 function ServiceWorkerGenerator(options) {
@@ -167,7 +166,7 @@ ServiceWorkerGenerator.prototype.apply = function apply(compiler) {
     const assets = Object.keys(compilation.assets);
     generateServiceWorkerFile.bind(self)({
       staticAssets: assets,
-      cacheFirstCacheName: `${cacheFirstCacheName || 'Assets'}-${crypto.createHash('sha256').update(assets.toString()).digest('base64')}`,
+      cacheFirstCacheName: `${cacheFirstCacheName || 'Assets'}-${Date.now()}`,
       networkFirstCacheName: networkFirstCacheName || 'Data',
       uglify,
       assetsPrefix,
