@@ -108,7 +108,7 @@ function generateRouting(type) {
         parts.push(`(${(new RegExp(route.uri))}).test(request)`);
         break;
       default:
-        parts.push(`${(new RegExp(route.uri))}`);
+        parts.push(`request === "${route.uri}"`);
     }
   });
   return parts.join(' || ');
