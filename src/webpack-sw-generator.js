@@ -148,12 +148,7 @@ function generateServiceWorkerFile(options) {
   } else {
     result = data;
   }
-
-  fs.writeFile('../service-worker.js', result, (err) => {
-    if (err) {
-      throw err;
-    }
-  });
+  return result;
 }
 
 ServiceWorkerGenerator.prototype.apply = function apply(compiler) {
@@ -163,15 +158,22 @@ ServiceWorkerGenerator.prototype.apply = function apply(compiler) {
   const networkFirstCacheName = options.networkFirst.cacheName;
   const { uglify, assetsPrefix, fetchOptions = {} } = options;
   compiler.plugin('emit', (compilation, callback) => {
-    const assets = Object.keys(compilation.assets);
-    generateServiceWorkerFile.bind(self)({
-      staticAssets: assets,
+    const source = generateServiceWorkerFile.bind(self)({
+      staticAssets: Object.keys(compilation.assets),
       cacheFirstCacheName: `${cacheFirstCacheName || 'Assets'}-${Date.now()}`,
       networkFirstCacheName: networkFirstCacheName || 'Data',
       uglify,
       assetsPrefix,
       fetchOptions,
     });
+    compilation.assets['service-worker.js'] = {
+      source() {
+        return source;
+      },
+      size() {
+        return source.length;
+      },
+    };
     callback();
   });
 };
