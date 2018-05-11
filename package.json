@@ -14,12 +14,15 @@
         "eslint": "^4.19.1",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-plugin-import": "^2.11.0",
-        "husky": "^0.14.3"
+        "husky": "^0.14.3",
+        "jsdoc": "^3.5.5"
     },
     "scripts": {
         "test": "jasmine",
+        "eslint": "./node_modules/.bin/eslint src/ --fix",
         "build": "babel src --out-dir lib",
-        "precommit": "npm run build && git add lib/"
+        "readme": " ./node_modules/.bin/jsdoc -c jsDoc.json",
+        "precommit": "npm run eslint && npm run build && npm run readme && git add jsdoc/ lib/"
     },
     "repository": {
         "type": "git",
