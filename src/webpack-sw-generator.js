@@ -1,6 +1,5 @@
 
 const fs = require('fs');
-const crypto = require('crypto');
 const UglifyJS = require('uglify-js');
 const eventHelpers = require('./helpers/eventHandlers');
 
@@ -56,10 +55,18 @@ function generateRouting(type) {
   const parts = [];
   const routes = this.options[type] ? this.options[type].routes : [];
   routes.forEach((route) => {
-    if (route.match === 'includes') {
-      parts.push(`request.includes("${route.uri}")`);
-    } else if (route.match === 'exact') {
-      parts.push(`request === "${route.uri}"`);
+    switch (route.match) {
+      case 'includes':
+        parts.push(`request.includes("${route.uri}")`);
+        break;
+      case 'exact':
+        parts.push(`request === "${route.uri}"`);
+        break;
+      case 'regex':
+        parts.push(`(${(new RegExp(route.uri))}).test(request)`);
+        break;
+      default:
+        parts.push(`request === "${route.uri}"`);
     }
   });
   return parts.join(' || ');
@@ -100,12 +107,7 @@ function generateServiceWorkerFile(options) {
   } else {
     result = data;
   }
-
-  fs.writeFile('../service-worker.js', result, (err) => {
-    if (err) {
-      throw err;
-    }
-  });
+  return result;
 }
 
 ServiceWorkerGenerator.prototype.apply = function apply(compiler) {
@@ -113,17 +115,24 @@ ServiceWorkerGenerator.prototype.apply = function apply(compiler) {
   const { options } = self;
   const cacheFirstCacheName = options.cacheFirst.cacheName;
   const networkFirstCacheName = options.networkFirst.cacheName;
-  const { uglify, assetsPrefix, fetchOptions } = options;
+  const { uglify, assetsPrefix, fetchOptions = {} } = options;
   compiler.plugin('emit', (compilation, callback) => {
-    const assets = Object.keys(compilation.assets);
-    generateServiceWorkerFile.bind(self)({
-      staticAssets: assets,
-      cacheFirstCacheName: `${cacheFirstCacheName || 'Assets'}-${crypto.createHash('sha256').update(assets.toString()).digest('base64')}`,
+    const source = generateServiceWorkerFile.bind(self)({
+      staticAssets: Object.keys(compilation.assets),
+      cacheFirstCacheName: `${cacheFirstCacheName || 'Assets'}-${Date.now()}`,
       networkFirstCacheName: networkFirstCacheName || 'Data',
       uglify,
       assetsPrefix,
       fetchOptions,
     });
+    compilation.assets['service-worker.js'] = {
+      source() {
+        return source;
+      },
+      size() {
+        return source.length;
+      },
+    };
     callback();
   });
 };
