@@ -17,7 +17,7 @@
         "husky": "^0.14.3"
     },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "jasmine",
         "build": "babel src --out-dir lib",
         "precommit": "npm run build && git add lib/"
     },
