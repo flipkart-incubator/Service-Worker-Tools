@@ -1,5 +1,6 @@
 
 const fs = require('fs');
+const crypto = require('crypto');
 const UglifyJS = require('uglify-js');
 const eventHelpers = require('./helpers/eventHandlers');
 
@@ -117,9 +118,10 @@ ServiceWorkerGenerator.prototype.apply = function apply(compiler) {
   const networkFirstCacheName = options.networkFirst.cacheName;
   const { uglify, assetsPrefix, fetchOptions = {} } = options;
   compiler.plugin('emit', (compilation, callback) => {
+    const assets = Object.keys(compilation.assets);
     const source = generateServiceWorkerFile.bind(self)({
-      staticAssets: Object.keys(compilation.assets),
-      cacheFirstCacheName: `${cacheFirstCacheName || 'Assets'}-${Date.now()}`,
+      staticAssets: assets,
+      ccacheFirstCacheName: `${cacheFirstCacheName || 'Assets'}-${crypto.createHash('sha256').update(assets.toString()).digest('base64')}`,
       networkFirstCacheName: networkFirstCacheName || 'Data',
       uglify,
       assetsPrefix,
