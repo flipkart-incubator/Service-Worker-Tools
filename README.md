@@ -1,4 +1,4 @@
-# fk-retail-service-worker
+## fk-retail-service-worker
 A webpack plugin that generates a service worker, and provides a set of utility methods to work with it. Think of the caching strategies you would like to apply ('cache first' or 'network first') and configure the plugin accordingly.
 
 ## Usage Examples ##
@@ -58,6 +58,4 @@ new ServiceWorkerGeneratorPlugin({
 ## Contributing ##
 * sourceCode for library is present in "src/"
     * Any changes should be made to this folder only.
-    * To build run "npm run build".
-    * Above command generates "lib/" folder which should be pushed along with your changes.
 * We use babel to transpile es6 code to es5 code. (Presets used "babel-preset-es2015" with support for last two browsers.)
