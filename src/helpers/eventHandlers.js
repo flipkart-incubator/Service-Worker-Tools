@@ -4,7 +4,7 @@ const generateInstallHandler = (cacheFirstCacheName, fetchOptions) => `function 
         return cache.addAll(urlsToCache.map(function (urlToPrefetch) {
             return new Request(urlToPrefetch,${JSON.stringify(fetchOptions)});
         })).then(function () {
-            console.log("All resources have been fetched and cached.);
+            console.log("All resources have been fetched and cached.");
         });
     }));
 }`;
