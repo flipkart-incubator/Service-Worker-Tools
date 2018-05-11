@@ -1,3 +1,17 @@
+/**
+ * Helper functions for Service Worker library.
+ * @module Helper
+ * @exports generateInstallHandler
+ * @exports generateMessageHandler
+ * @exports generateMessageHandler
+ */
+
+/**
+ * Returns install handler for service worker.
+ * @function generateInstallHandler
+ * @param {string} cacheFirstCacheName
+ * @param {string} fetchOptions
+ */
 const generateInstallHandler = (cacheFirstCacheName, fetchOptions) => `function (event) {
     event.waitUntil(caches.open("${cacheFirstCacheName}").then(function (cache) {
         console.log("Opened cache");
@@ -9,6 +23,10 @@ const generateInstallHandler = (cacheFirstCacheName, fetchOptions) => `function 
     }));
 }`;
 
+/**
+ * Returns message handler for service worker.
+ * @param {string} networkFirstCacheName
+ */
 const generateMessageHandler = networkFirstCacheName => `function (event) {
     if(event.data) {
         if (event.data.type === "SKIP-WAITING") {
@@ -25,6 +43,10 @@ const generateMessageHandler = networkFirstCacheName => `function (event) {
     }
 }`;
 
+/**
+ * Returns activation handler for service worker.
+ * @param {string} cacheFirstCacheName
+ */
 const generateActivationHandler = cacheFirstCacheName => `function (event) {
     event.waitUntil(
         caches.keys()
@@ -41,8 +63,8 @@ const generateActivationHandler = cacheFirstCacheName => `function (event) {
 }`;
 
 module.exports = {
-  generateInstallHandler,
-  generateMessageHandler,
-  generateActivationHandler,
+    generateInstallHandler,
+    generateMessageHandler,
+    generateActivationHandler,
 };
 
