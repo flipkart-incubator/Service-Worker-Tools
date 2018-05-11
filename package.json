@@ -22,7 +22,7 @@
         "eslint": "./node_modules/.bin/eslint src/ --fix",
         "build": "babel src --out-dir lib",
         "readme": " ./node_modules/.bin/jsdoc -c jsDoc.json",
-        "precommit": "npm run eslint && npm run build && npm run readme && git add lib/"
+        "precommit": "npm run eslint && npm run build && npm run readme && git add jsdoc/ lib/"
     },
     "repository": {
         "type": "git",
