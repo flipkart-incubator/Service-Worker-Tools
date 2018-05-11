@@ -51,7 +51,7 @@ const generateActivationHandler = cacheFirstCacheName => `function (event) {
     event.waitUntil(
         caches.keys()
         .then(function (keys) {
-            Promise.all(
+            return Promise.all(
                 keys.map(function (key) {
                     if (key !== "${cacheFirstCacheName}") {
                         return caches.delete(key);
