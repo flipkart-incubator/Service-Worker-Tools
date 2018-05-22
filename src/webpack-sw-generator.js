@@ -11,6 +11,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const UglifyJS = require('uglify-js');
 const eventHelpers = require('./helpers/eventHandlers');
+const path = require('path');
 
 /**
  * Returns static assets fetch handler for service worker.
@@ -130,6 +131,7 @@ function generateFileContent(options) {
  * */
 function generateServiceWorkerFile(options) {
     const data = generateFileContent.bind(this)(options);
+    const { output } = options;
     let result = '';
     if (options.uglify) {
         const uglifyOptions = typeof options.uglify === 'object' ? options.uglify : {};
@@ -137,7 +139,7 @@ function generateServiceWorkerFile(options) {
     } else {
         result = data;
     }
-    fs.writeFile('../service-worker.js', result, (err) => {
+    fs.writeFile(path.resolve(output.path, output.fileName), result, (err) => {
         if (err) {
             throw err;
         }
@@ -157,7 +159,12 @@ class ServiceWorkerGenerator {
         const { options } = this;
         const cacheFirstCacheName = options.cacheFirst.cacheName;
         const networkFirstCacheName = options.networkFirst.cacheName;
-        const { uglify, assetsPrefix, fetchOptions = {} } = options;
+        const {
+            uglify, assetsPrefix, fetchOptions = {}, output = {
+                fileName: 'service-worker.js',
+                path: '../',
+            },
+        } = options;
         compiler.plugin('emit', (compilation, callback) => {
             const assets = Object.keys(compilation.assets);
             generateServiceWorkerFile.bind(this)({
@@ -167,6 +174,7 @@ class ServiceWorkerGenerator {
                 uglify,
                 assetsPrefix,
                 fetchOptions,
+                output,
             });
             callback();
         });
