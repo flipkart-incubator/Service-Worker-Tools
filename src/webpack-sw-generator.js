@@ -54,7 +54,7 @@ const generateDynamicRouting = (dynamicCacheName, dynamicRouting) => `function (
 				if (event.request.method === "GET") {
 					return caches.open("${dynamicCacheName}")
 						.then(function (cache) {
-							cache.add(event.request, networkResponse);
+							cache.put(event.request, networkResponse.clone());
 							return networkResponse;
 						});
 				}
