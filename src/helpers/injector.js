@@ -1,5 +1,5 @@
 
-const iframeStyles = () => 'position: fixed;top: 0;width: 410px;padding:5px;height: 100px;left: 50%;transform: translate(-50%);background-color:#f0f5ea;box-shadow:0 0 1px rgba(94,164,0,.9);font-size:13px;border:1px solid #EFEFEF;display: none';
+const iframeStyles = () => 'position: fixed;top: 0;width: 410px;padding:5px;height: 1110px;left: 50%;transform: translate(-50%);background-color:#f0f5ea;box-shadow:0 0 1px rgba(94,164,0,.9);font-size:13px;border:1px solid #EFEFEF;display: none';
 
 /* eslint-disable import/prefer-default-export */
 const generateInjector = ({ fileName }) => `
