@@ -1,26 +1,36 @@
 
-const iframeStyles = () => 'position: fixed;top: 0;width: 410px;padding:5px;height: 55px;left: 50%;transform: translate(-50%);background-color:#FFF;box-shadow:0 2px 4px 0 rgba(204, 204, 204, 0.5);border:1px solid #EFEFEF;display: none';
+const iframeStyles = () => 'position: fixed;top: 0;width: 410px;padding:5px;height: 100px;left: 50%;transform: translate(-50%);background-color:#f0f5ea;box-shadow:0 0 1px rgba(94,164,0,.9);font-size:13px;border:1px solid #EFEFEF;display: none';
 
 /* eslint-disable import/prefer-default-export */
 const generateInjector = ({ fileName }) => `
-const appUpdateDoc ="<div>Please <span id='fetch-updates-link'>click here </span> to get the latest version of the application.</div>";
+const appUpdateDoc ="<div id='update-txt'><div>Application has been updated. Click the button below to get the latest version.</div><button id='update-app'>Update App</button></div>";
 const stateChangeHandler = (reg, newWorker, ifrm) => () => {
     if (navigator.serviceWorker.controller && reg.waiting && newWorker.state === 'installed') {
         const awaitingSW = reg.waiting;
-        const updateLink = document.getElementById('app-update-frame')
+        const appUpdateFrame = document.getElementById('app-update-frame');
+        const updateText= appUpdateFrame
             .contentWindow
             .document
-            .getElementById('fetch-updates-link');
+            .getElementById('update-txt');
+        const updateApp = appUpdateFrame
+            .contentWindow
+            .document
+            .getElementById('update-app');
         ifrm.style.display = 'block';
-        updateLink.style.color = '#027cd5';
-        updateLink.style.cursor = 'pointer';
-        updateLink.style.textDecoration = 'underline';
-        updateLink
-            .addEventListener('click', () => {
-                awaitingSW.postMessage({
-                    type: 'SKIP-WAITING',
-                });
+        updateText.style.color = '#4b583a';
+        updateText.style.cursor = 'pointer';
+        updateApp.style.color = '#fff';
+        updateApp.style.backgroundColor = '#4caf50';
+        updateApp.style.marginTop = '10px';
+        updateApp.style.padding = '8px';
+        updateApp.style.borderRadius = '3px';
+        updateApp.style.outline = "none";
+        updateApp.style.cursor = 'pointer';
+        updateApp.addEventListener('click', () => {
+            awaitingSW.postMessage({
+                type: 'SKIP-WAITING',
             });
+        });
     }
 };
 
