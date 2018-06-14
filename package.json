@@ -20,7 +20,7 @@
     "scripts": {
         "test": "jasmine",
         "eslint": "./node_modules/.bin/eslint src/ --fix",
-        "build": "babel src --out-dir lib",
+        "build": "babel src --out-dir lib --copy-files",
         "readme": " ./node_modules/.bin/jsdoc -c jsDoc.json",
         "precommit": "npm run eslint && npm run build && npm run readme && git add jsdoc/ lib/"
     },

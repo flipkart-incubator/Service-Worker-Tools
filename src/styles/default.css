@@ -1,0 +1,31 @@
+#app-update-frame {
+    position: fixed;
+    top: 0;
+    width: 410px;
+    padding: 5px;
+    height: 110px;
+    left: 50%;
+    transform: translate(-50%);
+    background-color: #f0f5ea;
+    box-shadow: 0 0 1px rgba(94, 164, 0, .9);
+    font-size: 13px;
+    border: 1px solid #EFEFEF;
+}
+
+#app-update-frame #update-txt {
+    color: #4b583a;
+}
+
+#app-update-frame button#update-app {
+    color: #FFF;
+    background-color: #4caf50;
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+.hidden-frame{
+    display:none;
+}
