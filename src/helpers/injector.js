@@ -1,6 +1,4 @@
-
-const appUpdateTemplate = "<div id='update-txt'><div>Application has been updated. Click the button below to get the latest version.</div><button id='update-app'>Update App</button></div>";
-
+import appUpdateTemplate from './templates/app-update.html';
 
 const generateInjector = ({ fileName }) => `
 const stateChangeHandler = (reg, newWorker, appUpdateContainer) => () => {
