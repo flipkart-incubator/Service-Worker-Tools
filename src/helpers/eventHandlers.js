@@ -30,12 +30,7 @@ const generateInstallHandler = (cacheFirstCacheName, fetchOptions) => `function 
 const generateMessageHandler = networkFirstCacheName => `function (event) {
     if(event.data) {
         if (event.data.type === "SKIP-WAITING") {
-            self.skipWaiting();
-            clients.matchAll().then(function (clientList) {
-                clientList.forEach(function(client) {
-                    client.postMessage("RELOAD");            
-                });
-            });
+            return self.skipWaiting();    
         }
         else if(event.data.type === "CLEAR-DATA") {
             caches.delete("${networkFirstCacheName}")

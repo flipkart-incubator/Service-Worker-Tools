@@ -15,14 +15,15 @@
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-plugin-import": "^2.11.0",
         "husky": "^0.14.3",
-        "jsdoc": "^3.5.5"
+        "jsdoc": "^3.5.5",
+        "less": "^2.7.3"
     },
     "scripts": {
         "test": "jasmine",
         "eslint": "./node_modules/.bin/eslint src/ --fix",
-        "build": "babel src --out-dir lib",
+        "build": "babel src --out-dir lib --copy-files",
         "readme": " ./node_modules/.bin/jsdoc -c jsDoc.json",
-        "precommit": "npm run eslint && npm run build && npm run readme && git add jsdoc/ lib/"
+        "precommit": "lessc src/styles/default.less lib/styles/default.css && npm run eslint && npm run build && npm run readme && git add jsdoc/ lib/"
     },
     "repository": {
         "type": "git",

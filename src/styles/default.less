@@ -1,0 +1,45 @@
+#offline-notification-frame,
+#app-update-frame {
+    position: fixed;
+    top: 0;
+    padding: 5px;
+    left: 50%;
+    transform: translate(-50%);
+    border: 1px solid #EFEFEF;
+    box-shadow: 0 0 1px rgba(94, 164, 0, .9);
+    font-size: 13px;
+    border: 1px solid #EFEFEF;
+}
+
+#offline-notification-frame {
+    background-color: #96927c;
+    color: #FFFF;
+}
+
+#app-update-frame {
+    padding: 15px;
+    background-color: #f0f5ea;
+    text-align: center;
+    #update-txt {
+        color: #4b583a;
+    }
+    button {
+        padding: 8px;
+        border-radius: 3px;
+        margin-top: 10px;
+        color: #FFF;
+        outline: none;
+        cursor: pointer;
+    }
+    button#update-app {
+        background-color: #4caf50;
+    }
+    button#ignore-update {
+        background-color: rgba(255,0,0,0.6);
+        margin-left: 10px;
+    }
+}
+
+.hidden-frame {
+    display: none;
+}
