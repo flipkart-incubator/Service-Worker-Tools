@@ -1,7 +1,7 @@
 
-const appUpdateTemplate = "<div id='update-txt'><div>Catch up with the latest version.</div><button id='update-app'>Update</button><button id='ignore-update'>Ignore</button></div>";
+const appUpdateTemplate = "<div id='update-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-star.png' /><span id='message'>Catch up with the latest version.</span><a id='update-app'>Update</a></span><a id='ignore-update'>X</a></div>";
 
-const offlineTemplate = '<div>You are offline. All that you see could be outdated.</div>';
+const offlineTemplate = "<div id='offline-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-plug.png' /><span id='message'>You are offline. All that you see could be outdated.</span></div>";
 
 const generateInjector = ({ fileName }) => `
 const messageHandler = (event) => {

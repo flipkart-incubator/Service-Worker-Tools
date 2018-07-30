@@ -1,40 +1,39 @@
 #offline-notification-frame,
 #app-update-frame {
+  padding: 15px;
   position: fixed;
-  top: 0;
-  padding: 5px;
   left: 50%;
   transform: translate(-50%);
-  box-shadow: 0 0 1px rgba(94, 164, 0, 0.9);
   font-size: 13px;
-  border: 1px solid #EFEFEF;
-}
-#offline-notification-frame {
-  background-color: #96927c;
+  background-color: #555555;
   color: #FFFF;
-}
-#app-update-frame {
-  padding: 15px;
-  background-color: #f0f5ea;
   text-align: center;
 }
-#app-update-frame #update-txt {
-  color: #4b583a;
+#app-update-frame {
+  top: 20px;
 }
-#app-update-frame button {
-  padding: 8px;
-  border-radius: 3px;
-  margin-top: 10px;
-  color: #FFF;
-  outline: none;
-  cursor: pointer;
+#offline-notification-frame {
+  bottom: 20px;
 }
-#app-update-frame button#update-app {
-  background-color: #4caf50;
+#update-txt,
+#offline-txt {
+  display: flex;
 }
-#app-update-frame button#ignore-update {
-  background-color: rgba(255, 0, 0, 0.6);
+#update-txt > #message,
+#offline-txt > #message {
   margin-left: 10px;
+}
+#app-update-frame a#update-app {
+  color: #FFF;
+  text-decoration: underline;
+  margin-left: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+#app-update-frame a#ignore-update {
+  color: #FFF;
+  margin-left: 10px;
+  cursor: pointer;
 }
 .hidden-frame {
   display: none;
