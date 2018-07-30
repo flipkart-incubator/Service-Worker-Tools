@@ -13,6 +13,7 @@ const UglifyJS = require('uglify-js');
 const eventHelpers = require('./helpers/eventHandlers');
 const path = require('path');
 const injectorHelpers = require('./helpers/injector');
+const _ = require('underscore');
 
 /**
  * Returns static assets fetch handler for service worker.
@@ -108,7 +109,7 @@ function generateFileContent(options) {
         }
         return '"/"';
     }).join(',')}];\n\n` +
-	`self.addEventListener("message", ${eventHelpers.generateMessageHandler(options.networkFirstCacheName)})\n\n` +
+	`self.addEventListener("message", ${eventHelpers.generateMessageHandler(_.pick(options, 'networkFirstCacheName', 'hooks'))})\n\n` +
 	`self.addEventListener("install",${eventHelpers.generateInstallHandler(options.cacheFirstCacheName, options.fetchOptions)})\n\n` +
 	`self.addEventListener("activate", ${eventHelpers.generateActivationHandler(options.cacheFirstCacheName)})\n\n`;
 
@@ -172,7 +173,7 @@ class ServiceWorkerGenerator {
             uglify, assetsPrefix, fetchOptions = {}, output = {
                 fileName: 'service-worker.js',
                 path: '../',
-            },
+            }, hooks = {},
         } = options;
         compiler.plugin('emit', (compilation, callback) => {
             const assets = Object.keys(compilation.assets);
@@ -184,6 +185,7 @@ class ServiceWorkerGenerator {
                 assetsPrefix,
                 fetchOptions,
                 output,
+                hooks,
             });
             generateInjector({
                 outputPath: output.path,
