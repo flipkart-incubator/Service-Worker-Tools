@@ -4,8 +4,8 @@
     "description": "Service Worker generator and utility function",
     "main": "lib/index.js",
     "dependencies": {
-        "uglify-js": "3.3.13",
-        "underscore": "^1.9.1"
+        "lodash": "^4.17.10",
+        "uglify-js": "3.3.13"
     },
     "devDependencies": {
         "babel-cli": "^6.26.0",
