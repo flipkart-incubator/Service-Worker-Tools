@@ -4,6 +4,7 @@
     "description": "Service Worker generator and utility function",
     "main": "lib/index.js",
     "dependencies": {
+        "lodash": "^4.17.10",
         "uglify-js": "3.3.13"
     },
     "devDependencies": {

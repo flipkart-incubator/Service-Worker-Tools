@@ -27,16 +27,17 @@ const generateInstallHandler = (cacheFirstCacheName, fetchOptions) => `function 
  * Returns message handler for service worker.
  * @param {string} networkFirstCacheName
  */
-const generateMessageHandler = networkFirstCacheName => `function (event) {
-    if(event.data) {
-        if (event.data.type === "SKIP-WAITING") {
-            return self.skipWaiting();    
+const generateMessageHandler = options => `function (event) {
+        if(event.data) {
+            if (event.data.type === "SKIP-WAITING") {
+                ${options.hooks.beforeUpdate ? `${options.hooks.beforeUpdate.toString()}()` : ''}
+                return self.skipWaiting();    
+            }
+            else if(event.data.type === "CLEAR-DATA") {
+                caches.delete("${options.networkFirstCacheName}")
+            }
         }
-        else if(event.data.type === "CLEAR-DATA") {
-            caches.delete("${networkFirstCacheName}")
-        }
-    }
-}`;
+    }`;
 
 /**
  * Returns activation handler for service worker.
