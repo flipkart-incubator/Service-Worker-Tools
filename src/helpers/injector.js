@@ -3,6 +3,8 @@ const appUpdateTemplate = "<div id='update-txt'><img src='https://retail.flixcar
 
 const offlineTemplate = "<div id='offline-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-plug.png' /><span id='message'>You are offline. All that you see could be outdated.</span></div>";
 
+const inFlightRequestsTemplate = "<div id='in-flight-requsts-txt'><span id='message'>Waitng for this page to complete ongoing requests...</span></div>"
+
 const generateInjector = ({ fileName }) => `
 const messageHandler = (event) => {
     if (event.data === 'RELOAD') {
@@ -41,6 +43,7 @@ if ('serviceWorker' in navigator) {
         .then((reg) => {
             const appUpdateContainer = createFrame("app-update-frame","${appUpdateTemplate}", ['hidden-frame']);
             const offlineMessageContainer = createFrame("offline-notification-frame", "${offlineTemplate}", ['hidden-frame']);
+            const inFlightRequestsTemplate = createFrame("in-flight-requests-frame", "${inFlightRequestsTemplate}", ['hidden-frame']);
             document.body.appendChild(appUpdateContainer); 
             document.body.appendChild(offlineMessageContainer); 
             document.getElementById('ignore-update').addEventListener('click', () => hideFrame('app-update-frame'));
@@ -51,6 +54,8 @@ if ('serviceWorker' in navigator) {
                         const awaitingSW = reg.waiting;
                         showFrame('app-update-frame')
                         document.getElementById('update-app').addEventListener('click', () => {
+                            hideFrame('app-update-frame');
+                            showFrame('in-flight-requests-frame');
                             awaitingSW.postMessage({
                                 type: 'SKIP-WAITING',
                             });
