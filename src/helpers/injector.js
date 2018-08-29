@@ -3,7 +3,7 @@ const appUpdateTemplate = "<div id='update-txt'><img src='https://retail.flixcar
 
 const offlineTemplate = "<div id='offline-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-plug.png' /><span id='message'>You are offline. All that you see could be outdated.</span></div>";
 
-const inFlightRequestsTemplate = "<div id='in-flight-requsts-txt'><span id='message'>Waitng for this page to complete ongoing requests...</span></div>"
+const inFlightRequestsTemplate = "<div id='in-flight-requsts-txt'><span id='message'>Waitng for this page to complete ongoing requests...</span></div>";
 
 const generateInjector = ({ fileName }) => `
 const messageHandler = (event) => {
