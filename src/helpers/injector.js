@@ -17,7 +17,7 @@ const createFrame = (id, innerHTML, classList) => {
     frame.setAttribute('id', id);
     frame.innerHTML = innerHTML;
     frame.classList.add(classList);
-    return frame;
+    document.body.appendChild(frame);
 }
 
 const hideFrame = (id) => document.getElementById(id).classList.add('hidden-frame');
@@ -41,11 +41,9 @@ navigator.serviceWorker.addEventListener('controllerchange',
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./${fileName}')
         .then((reg) => {
-            const appUpdateContainer = createFrame("app-update-frame","${appUpdateTemplate}", ['hidden-frame']);
-            const offlineMessageContainer = createFrame("offline-notification-frame", "${offlineTemplate}", ['hidden-frame']);
-            const inFlightRequestsTemplate = createFrame("in-flight-requests-frame", "${inFlightRequestsTemplate}", ['hidden-frame']);
-            document.body.appendChild(appUpdateContainer); 
-            document.body.appendChild(offlineMessageContainer); 
+            createFrame("app-update-frame","${appUpdateTemplate}", ['hidden-frame']);
+            createFrame("offline-notification-frame", "${offlineTemplate}", ['hidden-frame']);
+            createFrame("in-flight-requests-frame", "${inFlightRequestsTemplate}", ['hidden-frame']);
             document.getElementById('ignore-update').addEventListener('click', () => hideFrame('app-update-frame'));
             reg.addEventListener('updatefound', (e)  => {
                 const newWorker = reg.installing;
