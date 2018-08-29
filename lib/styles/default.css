@@ -18,13 +18,11 @@
   bottom: 20px;
 }
 #update-txt,
-#offline-txt,
-#in-flight-requests-frame {
+#offline-txt {
   display: flex;
 }
 #update-txt > #message,
-#offline-txt > #message,
-#in-flight-requests-frame > #message {
+#offline-txt > #message {
   margin-left: 10px;
 }
 #app-update-frame a#update-app {
