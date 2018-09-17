@@ -3,6 +3,8 @@ const appUpdateTemplate = "<div id='update-txt'><img src='https://retail.flixcar
 
 const offlineTemplate = "<div id='offline-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-plug.png' /><span id='message'>You are offline. All that you see could be outdated.</span></div>";
 
+const inFlightRequestsTemplate = "<div id='in-flight-requsts-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-hourglass.svg' /><span id='message'>Waiting for this page to complete ongoing requests...</span></div>";
+
 const generateInjector = ({ fileName }) => `
 const messageHandler = (event) => {
     if (event.data === 'RELOAD') {
@@ -15,7 +17,7 @@ const createFrame = (id, innerHTML, classList) => {
     frame.setAttribute('id', id);
     frame.innerHTML = innerHTML;
     frame.classList.add(classList);
-    return frame;
+    document.body.appendChild(frame);
 }
 
 const hideFrame = (id) => document.getElementById(id).classList.add('hidden-frame');
@@ -39,10 +41,9 @@ navigator.serviceWorker.addEventListener('controllerchange',
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./${fileName}')
         .then((reg) => {
-            const appUpdateContainer = createFrame("app-update-frame","${appUpdateTemplate}", ['hidden-frame']);
-            const offlineMessageContainer = createFrame("offline-notification-frame", "${offlineTemplate}", ['hidden-frame']);
-            document.body.appendChild(appUpdateContainer); 
-            document.body.appendChild(offlineMessageContainer); 
+            createFrame("app-update-frame","${appUpdateTemplate}", ['hidden-frame']);
+            createFrame("offline-notification-frame", "${offlineTemplate}", ['hidden-frame']);
+            createFrame("in-flight-requests-frame", "${inFlightRequestsTemplate}", ['hidden-frame']);
             document.getElementById('ignore-update').addEventListener('click', () => hideFrame('app-update-frame'));
             reg.addEventListener('updatefound', (e)  => {
                 const newWorker = reg.installing;
@@ -51,6 +52,8 @@ if ('serviceWorker' in navigator) {
                         const awaitingSW = reg.waiting;
                         showFrame('app-update-frame')
                         document.getElementById('update-app').addEventListener('click', () => {
+                            hideFrame('app-update-frame');
+                            showFrame('in-flight-requests-frame');
                             awaitingSW.postMessage({
                                 type: 'SKIP-WAITING',
                             });

@@ -1,5 +1,6 @@
 #offline-notification-frame,
-#app-update-frame {
+#app-update-frame,
+#in-flight-requests-frame {
   padding: 15px;
   position: fixed;
   left: 50%;
@@ -9,7 +10,8 @@
   color: #FFFF;
   text-align: center;
 }
-#app-update-frame {
+#app-update-frame,
+#in-flight-requests-frame {
   top: 20px;
 }
 #offline-notification-frame {
