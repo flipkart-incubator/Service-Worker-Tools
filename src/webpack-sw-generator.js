@@ -20,7 +20,7 @@ const _ = require('lodash');
  * @function generateStaticAssetsFetchHandler
  * @param {string} staticRouting - Routes for which static assets are handled by SW.
  */
-const generateStaticAssetsFetchHandler = staticRouting => `function (event) {
+const generateStaticAssetsFetchHandler = (staticRouting, cacheFirstCacheName) => `function (event) {
 	var request = event.request.url,
 	hashFragmentStart = request.indexOf('#');
 	if (hashFragmentStart > -1) {
@@ -29,10 +29,18 @@ const generateStaticAssetsFetchHandler = staticRouting => `function (event) {
 	if (${staticRouting}) {
 		event.respondWith(caches.match(event.request).then(function (response) {
 			if (response) {
-				console.log(event.request.url);
 				return response;
-			}
-			return fetch(event.request);
+            }
+            else {
+                return fetch(event.request)
+                .then(function(networkResponse) {
+                    return caches.open("${cacheFirstCacheName}")
+                    .then(function(cache) {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
+                    });
+                })
+            }
 		}));
 	}
 }`;
@@ -115,7 +123,7 @@ function generateFileContent(options) {
 
     /* add cacheFirstHandler if there are static assets to fetch */
     if (cacheFirstRoutes !== '') {
-        fileContent = `${fileContent}\n\nself.addEventListener("fetch", ${generateStaticAssetsFetchHandler(cacheFirstRoutes)})`;
+        fileContent = `${fileContent}\n\nself.addEventListener("fetch", ${generateStaticAssetsFetchHandler(cacheFirstRoutes, options.cacheFirstCacheName)})`;
     }
 
     /* add networkFirstHandler if there are dynamic routes to fetch */
