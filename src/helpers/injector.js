@@ -17,7 +17,7 @@ const createFrame = (id, innerHTML, classList) => {
     frame.setAttribute('id', id);
     frame.innerHTML = innerHTML;
     frame.classList.add(classList);
-    document.body.appendChild(frame);
+    return frame;
 }
 
 const hideFrame = (id) => document.getElementById(id).classList.add('hidden-frame');
@@ -39,11 +39,14 @@ navigator.serviceWorker.addEventListener('controllerchange',
 );
 
 if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
     navigator.serviceWorker.register('./${fileName}')
         .then((reg) => {
-            createFrame("app-update-frame","${appUpdateTemplate}", ['hidden-frame']);
-            createFrame("offline-notification-frame", "${offlineTemplate}", ['hidden-frame']);
-            createFrame("in-flight-requests-frame", "${inFlightRequestsTemplate}", ['hidden-frame']);
+            var container = document.createElement('div');
+            container.appendChild(createFrame("app-update-frame","${appUpdateTemplate}", ['hidden-frame']));
+            container.appendChild(createFrame("offline-notification-frame", "${offlineTemplate}", ['hidden-frame']));
+            container.appendChild(createFrame("in-flight-requests-frame", "${inFlightRequestsTemplate}", ['hidden-frame']));
+            document.body.appendChild(container);
             document.getElementById('ignore-update').addEventListener('click', () => hideFrame('app-update-frame'));
             reg.addEventListener('updatefound', (e)  => {
                 const newWorker = reg.installing;
@@ -65,6 +68,7 @@ if ('serviceWorker' in navigator) {
         }, (err) => {
             throw new Error('Service worker registration failed: ', err);
         });
+    })
 }`;
 
 module.exports = {
