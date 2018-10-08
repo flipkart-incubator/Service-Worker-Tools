@@ -30,13 +30,15 @@ addEventListener('online', () => hideFrame("offline-notification-frame"));
 
 var refreshing;
 
-navigator.serviceWorker.addEventListener('controllerchange',
-  function() {
-    if (refreshing) return;
-    refreshing = true;
-    window.location.reload();
-  }
-);
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange',
+        function() {
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+        }
+    );
+}
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./${fileName}')
