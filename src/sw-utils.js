@@ -37,11 +37,14 @@ window.addEventListener('offline', () => showFrame('offline-notification-frame')
 
 window.addEventListener('online', () => hideFrame('offline-notification-frame'));
 
+createFrame('app-update-frame', appUpdateTemplate, ['hidden-frame']);
+
+createFrame('offline-notification-frame', offlineTemplate, ['hidden-frame']);
+
+createFrame('in-flight-requests-frame', inFlightRequestsTemplate, ['hidden-frame']);
+
 function updateExperience(sw) {
     let refreshing;
-    createFrame('app-update-frame', appUpdateTemplate, ['hidden-frame']);
-    createFrame('offline-notification-frame', offlineTemplate, ['hidden-frame']);
-    createFrame('in-flight-requests-frame', inFlightRequestsTemplate, ['hidden-frame']);
     document.getElementById('ignore-update').addEventListener('click', () => hideFrame('app-update-frame'));
     navigator.serviceWorker.addEventListener(
         'controllerchange',
