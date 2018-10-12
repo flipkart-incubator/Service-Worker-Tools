@@ -12,7 +12,6 @@ const crypto = require('crypto');
 const UglifyJS = require('uglify-js');
 const eventHelpers = require('./helpers/eventHandlers');
 const path = require('path');
-const injectorHelpers = require('./helpers/injector');
 const _ = require('lodash');
 
 /**
@@ -148,14 +147,6 @@ function generateServiceWorkerFile(options) {
     });
 }
 
-function generateInjector({ outputPath, fileName }) {
-    fs.writeFile(path.resolve(outputPath, 'service-worker-injector.js'), injectorHelpers.generateInjector({ fileName }), (err) => {
-        if (err) {
-            throw err;
-        }
-    });
-}
-
 /**
  * Leverages webpack compiler to create a webpack plugin that generates service worker.
  * @class ServiceWorkerGenerator
@@ -186,10 +177,6 @@ class ServiceWorkerGenerator {
                 fetchOptions,
                 output,
                 hooks,
-            });
-            generateInjector({
-                outputPath: output.path,
-                fileName: output.fileName,
             });
             callback();
         });

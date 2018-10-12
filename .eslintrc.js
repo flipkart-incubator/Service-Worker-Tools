@@ -3,7 +3,9 @@ module.exports = {
     globals:{
         "navigator":true,
         "location":true,
-        "window":true
+        "window":true,
+        "document":true,
+        "addEventListener":true
     },
     rules: {
         "indent": ["error", 4],

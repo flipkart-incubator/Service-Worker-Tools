@@ -33,9 +33,9 @@ const hideFrame = id => document.getElementById(id).classList.add('hidden-frame'
 
 const showFrame = id => document.getElementById(id).classList.remove('hidden-frame');
 
-addEventListener('offline', () => showFrame('offline-notification-frame'));
+window.addEventListener('offline', () => showFrame('offline-notification-frame'));
 
-addEventListener('online', () => hideFrame('offline-notification-frame'));
+window.addEventListener('online', () => hideFrame('offline-notification-frame'));
 
 function updateExperience(sw) {
     let refreshing;
