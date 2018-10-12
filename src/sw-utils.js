@@ -22,26 +22,9 @@ const createFrame = (id, innerHTML, classList) => {
     document.body.appendChild(frame);
 };
 
-const appUpdateTemplate = "<div id='update-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-star.png' /><span id='message'>Catch up with the latest version.</span><a id='update-app'>Update</a></span><a id='ignore-update'>X</a></div>";
-
-const offlineTemplate = "<div id='offline-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-plug.png' /><span id='message'>You are offline. All that you see could be outdated.</span></div>";
-
-const inFlightRequestsTemplate = "<div id='in-flight-requsts-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-hourglass.svg' /><span id='message'>Waiting for this page to complete ongoing requests...</span></div>";
-
-
 const hideFrame = id => document.getElementById(id).classList.add('hidden-frame');
 
 const showFrame = id => document.getElementById(id).classList.remove('hidden-frame');
-
-window.addEventListener('offline', () => showFrame('offline-notification-frame'));
-
-window.addEventListener('online', () => hideFrame('offline-notification-frame'));
-
-createFrame('app-update-frame', appUpdateTemplate, ['hidden-frame']);
-
-createFrame('offline-notification-frame', offlineTemplate, ['hidden-frame']);
-
-createFrame('in-flight-requests-frame', inFlightRequestsTemplate, ['hidden-frame']);
 
 function updateExperience(sw) {
     let refreshing;
@@ -64,10 +47,20 @@ function updateExperience(sw) {
     });
 }
 
-function injectServiceWorker({ defaultBehaviour = false, cb }) {
+function injectServiceWorker({ defaultBehaviour = false, cb } = {}) {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
             .then((reg) => {
+                if (defaultBehaviour) {
+                    const appUpdateTemplate = "<div id='update-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-star.png' /><span id='message'>Catch up with the latest version.</span><a id='update-app'>Update</a></span><a id='ignore-update'>X</a></div>";
+                    const offlineTemplate = "<div id='offline-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-plug.png' /><span id='message'>You are offline. All that you see could be outdated.</span></div>";
+                    const inFlightRequestsTemplate = "<div id='in-flight-requsts-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-hourglass.svg' /><span id='message'>Waiting for this page to complete ongoing requests...</span></div>";
+                    window.addEventListener('offline', () => showFrame('offline-notification-frame'));
+                    window.addEventListener('online', () => hideFrame('offline-notification-frame'));
+                    createFrame('app-update-frame', appUpdateTemplate, ['hidden-frame']);
+                    createFrame('offline-notification-frame', offlineTemplate, ['hidden-frame']);
+                    createFrame('in-flight-requests-frame', inFlightRequestsTemplate, ['hidden-frame']);
+                }
                 reg.addEventListener('updatefound', () => {
                     const newWorker = reg.installing;
                     newWorker.addEventListener('statechange', () => {
