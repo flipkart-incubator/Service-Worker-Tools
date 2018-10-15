@@ -28,7 +28,7 @@ const hideFrame = id => document.getElementById(id).classList.add('hidden-frame'
 
 const showFrame = id => document.getElementById(id).classList.remove('hidden-frame');
 
-function updateExperience({ sw, onUpdateClick }) {
+function updateExperience({ sw, onUpdateClick = () => Promise.resolve() }) {
     let refreshing;
     document.getElementById('ignore-update').addEventListener('click', () => hideFrame('app-update-frame'));
     navigator.serviceWorker.addEventListener(
@@ -41,14 +41,14 @@ function updateExperience({ sw, onUpdateClick }) {
     );
     showFrame('app-update-frame');
     document.getElementById('update-app').addEventListener('click', () => {
-        hideFrame('app-update-frame');
-        showFrame('in-flight-requests-frame');
-        sw.postMessage({
-            type: 'SKIP-WAITING',
-        });
-        if (onUpdateClick) {
-            onUpdateClick();
-        }
+        onUpdateClick()
+            .then(() => {
+                hideFrame('app-update-frame');
+                showFrame('in-flight-requests-frame');
+                sw.postMessage({
+                    type: 'SKIP-WAITING',
+                });
+            });
     });
 }
 
