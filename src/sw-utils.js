@@ -14,6 +14,8 @@
  * @param {funtion} updateCallback - Callback to be triggered when service worker update is found.
  */
 
+import { APP_UPDATE_TEMPLATE, OFFLINE_TEMPLATE, IN_FLIGHT_REQUESTS_TEMPLATE } from './constants';
+
 const createFrame = (id, innerHTML, classList) => {
     const frame = document.createElement('div');
     frame.setAttribute('id', id);
@@ -52,14 +54,11 @@ function injectServiceWorker({ withUpdate = false, cb } = {}) {
         navigator.serviceWorker.register('/service-worker.js')
             .then((reg) => {
                 if (withUpdate) {
-                    const appUpdateTemplate = "<div id='update-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-star.png' /><span id='message'>Catch up with the latest version.</span><a id='update-app'>Update</a></span><a id='ignore-update'>X</a></div>";
-                    const offlineTemplate = "<div id='offline-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-plug.png' /><span id='message'>You are offline. All that you see could be outdated.</span></div>";
-                    const inFlightRequestsTemplate = "<div id='in-flight-requsts-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-hourglass.svg' /><span id='message'>Waiting for this page to complete ongoing requests...</span></div>";
                     window.addEventListener('offline', () => showFrame('offline-notification-frame'));
                     window.addEventListener('online', () => hideFrame('offline-notification-frame'));
-                    createFrame('app-update-frame', appUpdateTemplate, ['hidden-frame']);
-                    createFrame('offline-notification-frame', offlineTemplate, ['hidden-frame']);
-                    createFrame('in-flight-requests-frame', inFlightRequestsTemplate, ['hidden-frame']);
+                    createFrame('app-update-frame', APP_UPDATE_TEMPLATE, ['hidden-frame']);
+                    createFrame('offline-notification-frame', OFFLINE_TEMPLATE, ['hidden-frame']);
+                    createFrame('in-flight-requests-frame', IN_FLIGHT_REQUESTS_TEMPLATE, ['hidden-frame']);
                 }
                 reg.addEventListener('updatefound', () => {
                     const newWorker = reg.installing;
