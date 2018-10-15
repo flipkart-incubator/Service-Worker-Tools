@@ -28,7 +28,7 @@ const hideFrame = id => document.getElementById(id).classList.add('hidden-frame'
 
 const showFrame = id => document.getElementById(id).classList.remove('hidden-frame');
 
-function updateExperience(sw) {
+function updateExperience({ sw, onUpdateClick }) {
     let refreshing;
     document.getElementById('ignore-update').addEventListener('click', () => hideFrame('app-update-frame'));
     navigator.serviceWorker.addEventListener(
@@ -46,10 +46,13 @@ function updateExperience(sw) {
         sw.postMessage({
             type: 'SKIP-WAITING',
         });
+        if (onUpdateClick) {
+            onUpdateClick();
+        }
     });
 }
 
-function injectServiceWorker({ withUpdate = false, cb } = {}) {
+function injectServiceWorker({ withUpdate = false, cb, onUpdateClick } = {}) {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
             .then((reg) => {
@@ -68,7 +71,7 @@ function injectServiceWorker({ withUpdate = false, cb } = {}) {
                             if (!withUpdate && cb && typeof cb === 'function') {
                                 cb(awaitingSW);
                             } else if (withUpdate) {
-                                updateExperience(awaitingSW);
+                                updateExperience({ sw: awaitingSW, onUpdateClick });
                             }
                         }
                     });
