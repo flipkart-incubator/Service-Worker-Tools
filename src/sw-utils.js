@@ -47,11 +47,11 @@ function updateExperience(sw) {
     });
 }
 
-function injectServiceWorker({ defaultBehaviour = false, cb } = {}) {
+function injectServiceWorker({ withUpdate = false, cb } = {}) {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
             .then((reg) => {
-                if (defaultBehaviour) {
+                if (withUpdate) {
                     const appUpdateTemplate = "<div id='update-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-star.png' /><span id='message'>Catch up with the latest version.</span><a id='update-app'>Update</a></span><a id='ignore-update'>X</a></div>";
                     const offlineTemplate = "<div id='offline-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-plug.png' /><span id='message'>You are offline. All that you see could be outdated.</span></div>";
                     const inFlightRequestsTemplate = "<div id='in-flight-requsts-txt'><img src='https://retail.flixcart.com/www/fk-retail-vpp/icon-hourglass.svg' /><span id='message'>Waiting for this page to complete ongoing requests...</span></div>";
@@ -66,9 +66,9 @@ function injectServiceWorker({ defaultBehaviour = false, cb } = {}) {
                     newWorker.addEventListener('statechange', () => {
                         if (navigator.serviceWorker.controller && reg.waiting && newWorker.state === 'installed') {
                             const awaitingSW = reg.waiting;
-                            if (!defaultBehaviour && cb && typeof cb === 'function') {
+                            if (!withUpdate && cb && typeof cb === 'function') {
                                 cb(awaitingSW);
-                            } else if (defaultBehaviour) {
+                            } else if (withUpdate) {
                                 updateExperience(awaitingSW);
                             }
                         }
