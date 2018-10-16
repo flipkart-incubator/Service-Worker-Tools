@@ -41,10 +41,10 @@ function updateExperience({ sw, onUpdateClick = () => Promise.resolve() }) {
     );
     showFrame('app-update-frame');
     document.getElementById('update-app').addEventListener('click', () => {
+        hideFrame('app-update-frame');
+        showFrame('in-flight-requests-frame');
         onUpdateClick()
             .finally(() => {
-                hideFrame('app-update-frame');
-                showFrame('in-flight-requests-frame');
                 sw.postMessage({
                     type: 'SKIP-WAITING',
                 });
