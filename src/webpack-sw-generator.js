@@ -7,11 +7,9 @@
  * @exports ServiceWorkerGenerator
  */
 
-const fs = require('fs');
 const crypto = require('crypto');
 const UglifyJS = require('uglify-js');
 const eventHelpers = require('./helpers/eventHandlers');
-const path = require('path');
 const _ = require('lodash');
 
 /**
@@ -132,7 +130,6 @@ function generateFileContent(options) {
  * */
 function generateServiceWorkerFile(options) {
     const data = generateFileContent.bind(this)(options);
-    const { output } = options;
     let result = '';
     if (options.uglify) {
         const uglifyOptions = typeof options.uglify === 'object' ? options.uglify : {};
@@ -140,11 +137,7 @@ function generateServiceWorkerFile(options) {
     } else {
         result = data;
     }
-    fs.writeFile(path.resolve(output.path, output.fileName), result, (err) => {
-        if (err) {
-            throw err;
-        }
-    });
+    return result;
 }
 
 /**
@@ -161,23 +154,22 @@ class ServiceWorkerGenerator {
         const cacheFirstCacheName = options.cacheFirst.cacheName;
         const networkFirstCacheName = options.networkFirst.cacheName;
         const {
-            uglify, assetsPrefix, fetchOptions = {}, output = {
-                fileName: 'service-worker.js',
-                path: '../',
-            }, hooks = {},
+            uglify, assetsPrefix, fetchOptions = {},
         } = options;
         compiler.plugin('emit', (compilation, callback) => {
             const assets = Object.keys(compilation.assets);
-            generateServiceWorkerFile.bind(this)({
+            const source = generateServiceWorkerFile.bind(this)({
                 staticAssets: assets,
                 cacheFirstCacheName: `${cacheFirstCacheName || 'Assets'}-${crypto.createHash('sha256').update(assets.toString()).digest('base64')}`, // assets hash prevents removal of static cache if no assets have changed
                 networkFirstCacheName: networkFirstCacheName || 'Data',
                 uglify,
                 assetsPrefix,
                 fetchOptions,
-                output,
-                hooks,
             });
+            compilation.assets['service-worker.js'] = {
+                source: () => Buffer.from(source),
+                size() { return Buffer.byteLength(source); },
+            };
             callback();
         });
     }
