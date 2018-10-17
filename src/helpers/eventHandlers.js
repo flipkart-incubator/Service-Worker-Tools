@@ -30,7 +30,6 @@ const generateInstallHandler = (cacheFirstCacheName, fetchOptions) => `function 
 const generateMessageHandler = options => `function (event) {
         if(event.data) {
             if (event.data.type === "SKIP-WAITING") {
-                ${options.hooks.beforeUpdate ? `(${options.hooks.beforeUpdate.toString()})()` : ''}
                 return self.skipWaiting();    
             }
             else if(event.data.type === "CLEAR-DATA") {
